@@ -40,7 +40,7 @@ class Sendega {
 	function SMS($recipient, $message, $sender = ""){
 		$sms = $this->properties;
 		$sms["destination"] = $recipient;
-		$sms["content"] = $message;
+		$sms["content"] = utf8_decode($message);
 		if(strlen($sender)){
 			$sms["sender"] = $sender;
 		}
