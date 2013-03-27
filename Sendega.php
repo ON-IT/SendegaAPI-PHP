@@ -34,7 +34,7 @@ class Sendega {
 	private function _send($content){
 		$url = $this->base . "?" . http_build_query($content);
 		$status = file_get_contents($url);
-		print $status;
+		return $status;
 	}
 
 	function SMS($recipient, $message, $sender = ""){
