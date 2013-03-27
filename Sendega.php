@@ -40,12 +40,9 @@ class Sendega
 	private function handleResponse($response)
 	{
 		$status = simplexml_load_string($response);
-		print $status->asXML();
-		if($status->SendResult->Success == 'True')
-			return $status->SendResult->MessageID;
-		print "a" . $status->SendResult;
-		print "b" . $status->SendResult->ErrorNumber;
-//		throw new SendegaException($status->SendResult);
+		if($status->Success == 'true')
+			return $status->MessageID;
+		throw new SendegaException($status);
 	}
 
 	private function call($content)
@@ -63,7 +60,7 @@ class Sendega
 		if(strlen($sender) > 0){
 			$sms["sender"] = $sender;
 		}
-		$this->call($sms);
+		return $this->call($sms);
 	}
 
 	function MMS($recipient, $message, $attachment, $sender = "")
@@ -74,61 +71,16 @@ class Sendega
 
 /* Exceptions */
 
-interface IException
-{
-    /* Protected methods inherited from Exception class */
-    public function getMessage();                 // Exception message
-    public function getCode();                    // User-defined Exception code
-    public function getFile();                    // Source filename
-    public function getLine();                    // Source line
-    public function getTrace();                   // An array of the backtrace()
-    public function getTraceAsString();           // Formated string of trace
-   
-    /* Overrideable methods inherited from Exception class */
-    public function __toString();                 // formated string for display
-    public function __construct($message = null, $code = 0);
-}
-
-abstract class CustomException extends Exception implements IException
-{
-    protected $message = 'Unknown exception';     // Exception message
-    private   $string;                            // Unknown
-    protected $code    = 0;                       // User-defined exception code
-    protected $file;                              // Source filename of exception
-    protected $line;                              // Source line of exception
-    private   $trace;                             // Unknown
-
-    public function __construct($message = null, $code = 0)
-    {
-        if (!$message) {
-            throw new $this('Unknown '. get_class($this));
-        }
-        parent::__construct($message, $code);
-    }
-   
-    public function __toString()
-    {
-        return get_class($this) . " '{$this->message}' in {$this->file}({$this->line})\n"
-                                . "{$this->getTraceAsString()}";
-    }
-}
-
 class ArgumentMissingException extends Exception 
 {
 }
+
 class SendegaException extends Exception
 {
 	function __construct($status = null, $code = 0)
 	{
-		$this->message = "test" . $status->ErrorMessage;
+		$this->message = $status->ErrorMessage;
+		$this->code = $status->ErrorNumber;
 	}
-}
-
-$sendega = new Sendega("1235", "57892");
-try {
-$sendega->SMS("99508374", "hellooo");
-} catch (SendegaException $e){
-	print "Tryyyn";
-	print $e;
 }
 ?>
