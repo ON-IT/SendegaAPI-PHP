@@ -33,7 +33,7 @@ class Sendega
 		$this->properties["username"] = $un;
 		$this->properties["password"] = $pwd;
 		if(strlen($sender) > 0){
-			$this->properties["sender"] = $sender;
+			$this->properties["sender"] = urlencode($sender);
 		}
 	}
 
@@ -52,6 +52,11 @@ class Sendega
 		return $this->handleResponse($status);
 	}
 
+	function SendDeliveryReport($url)
+	{
+		$this->properties["dlrUrl"] = $url;
+	}
+
 	function SMS($recipient, $message, $sender = "")
 	{
 		$sms = $this->properties;
@@ -63,9 +68,41 @@ class Sendega
 		return $this->call($sms);
 	}
 
-	function MMS($recipient, $message, $attachment, $sender = "")
+	function MMS($recipient, $message, $attachment = "", $sender = "")
 	{
 		$mms = $this->properties;
+		$mms["destination"] = $recipient;
+		$mms["contentTypeID"] = 3;
+		$mms["ContentHeader"] = $message;
+
+		if(strlen($attachment) > 0)
+		{
+			$file = tempnam("tmp", "zip");
+			$zip = new ZipArchive();
+			$zip->open($file, ZipArchive::OVERWRITE);
+			$zip->addFile($attachment);
+			$zip->close();
+			$encoded = base64_encode(file_get_contents($file));
+			$mms["content"] = base64_encode($encoded);
+		}
+		
+		if(strlen($sender) > 0)
+			$bm["sender"] = $sender;
+		
+		return $this->call($mms);
+	}
+
+	function Bookmark($recipient, $url, $sender = "")
+	{
+		$bm = $this->properties;
+		$bm["destination"] = $recipient;
+		$bm["contentTypeID"] = 0;
+		$bm["content"] = $url;
+		
+		if(strlen($sender) > 0)
+			$bm["sender"] = $sender;
+		
+		return $this->call($bm);
 	}
 }
 
