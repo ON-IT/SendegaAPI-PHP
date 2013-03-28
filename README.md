@@ -9,6 +9,7 @@ Sendega SMS API is a basic wrapper for sending SMS and MMS through Sendega.com. 
     require_once("Sendega.php")
     $Sendega = new Sendega("ID", "Password", "Sender");
     print $Sendega->SMS("Number", "Message"); // Sends SMS and prints the message ID
+    print $Sendega->MMS("Number", "Message", "Attachment"); // Sends MMS with "Attachment" attached (be vcf or image) and prints message ID.
     
     var_dump($Sendega->Lookup("Number")); // Looks up number info for Number
     ?>
