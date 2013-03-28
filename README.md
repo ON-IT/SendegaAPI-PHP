@@ -1,4 +1,4 @@
-# SendegaAPI-PHP
+# SendegaAPI - PHP
 ==============
 
 Sendega SMS API is a basic wrapper for sending SMS and MMS through Sendega.com. It can also be used to do number lookup.
@@ -12,6 +12,12 @@ Sendega SMS API is a basic wrapper for sending SMS and MMS through Sendega.com. 
     
     var_dump($Sendega->Lookup("Number")); // Looks up number info for Number
     ?>
+
+## Todo
+
+ * Implement premium SMS and MMS (charging recipient)
+ * Implement logging
+ * World domination
 
 ## License
 
