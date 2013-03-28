@@ -89,6 +89,10 @@ class Sendega
 		
 		if(strlen($sender) > 0)
 			$mms["sender"] = $sender;
+
+		if(!is_numeric($mms["sender"]))
+			throw new SendegaException("Alphanumeric sender is not valid for MMS", 1028);
+
 		return $this->call($mms);
 	}
 
@@ -117,8 +121,14 @@ class SendegaException extends Exception
 {
 	function __construct($status = null, $code = 0)
 	{
-		$this->message = $status->ErrorMessage;
-		$this->code = $status->ErrorNumber;
+		if($code == 0)
+		{
+			$this->message = $status->ErrorMessage;
+			$this->code = $status->ErrorNumber;
+		} else {
+			$this->message = $status;
+			$this->code = $code;
+		}
 	}
 }
 ?>
