@@ -88,17 +88,17 @@ class Sendega
 		}
 		
 		if(strlen($sender) > 0)
-			$bm["sender"] = $sender;
-		
+			$mms["sender"] = $sender;
 		return $this->call($mms);
 	}
 
-	function Bookmark($recipient, $url, $sender = "")
+	function Bookmark($recipient, $description, $url, $sender = "")
 	{
 		$bm = $this->properties;
 		$bm["destination"] = $recipient;
 		$bm["contentTypeID"] = 0;
-		$bm["content"] = $url;
+		$bm["contentHeader"] = $url;
+		$bm["content"] = $description;
 		
 		if(strlen($sender) > 0)
 			$bm["sender"] = $sender;
