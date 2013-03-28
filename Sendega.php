@@ -109,6 +109,64 @@ class Sendega
 		
 		return $this->call($bm);
 	}
+
+	function Lookup($number, $lang = "no")
+	{
+		$base = "http://smsc.sendega.com/ExtraServices/NumberEnquiry.asmx/GetSubscriberInformation";
+		$params = array(
+				"username" => $this->properties["username"],
+				"password" => $this->properties["password"],
+				"msisdn" => $number,
+				"outputLanguage" => $lang
+				);
+		$response = file_get_contents($base . "?" . http_build_query($params));
+		$xml = simplexml_load_string($response);
+		return new Info($xml);
+	}
+}
+
+class Info {
+	public $Name = "";
+	public $LastName = "";
+	public $Address1 = "";
+	public $Address2 = "";
+	public $Zip = "";
+	public $City = "";
+	public $CompanyNo = "";
+	public $Lat = 0;
+	public $Long = 0;
+	public $Birthdate = null;
+
+	function __construct($xml)
+	{
+		if($xml->Success == "false")
+			throw new SendegaException("No hit for " . $number, 9999);
+		if($xml->Persons->SubscriberInformationPerson->count() > 0)
+		{
+			$this->map($xml->Persons->SubscriberInformationPerson);
+		} 
+		elseif($xml->Companies->SubscriberInformationCompany->count() > 0)
+		{
+			$this->map($xml->Companies->SubscriberInformationCompany);
+		}
+	}
+
+	private function map($xml)
+	{
+		if(strlen($xml->Name) > 0)
+			$this->Name = (string)$xml->Name;
+		else
+			$this->Name = (string)$xml->FirstName;
+		$this->LastName = (string)$xml->LastName;
+		$this->CompanyNo = (string)$xml->OrganizationNumber;
+		$this->Birthdate = (string)$xml->Birthdate;
+		$this->Address1 = (string)$xml->Addresses->Address[0]->Address1;
+		$this->Address2 = (string)$xml->Addresses->Address[0]->Address2;
+		$this->Zip = (string)$xml->Addresses->Address[0]->Zip;
+		$this->City = (string)$xml->Addresses->Address[0]->City;
+		$this->Lat = (string)$xml->Addresses->Address[0]->Latitude;
+		$this->Long = (string)$xml->Addresses->Address[0]->Longitude;
+	}
 }
 
 /* Exceptions */
