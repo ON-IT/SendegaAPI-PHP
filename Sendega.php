@@ -121,7 +121,7 @@ class Sendega
 				);
 		$response = file_get_contents($base . "?" . http_build_query($params));
 		$xml = simplexml_load_string($response);
-		return new Info($xml);
+		return new Info($xml, $number);
 	}
 }
 
@@ -136,11 +136,14 @@ class Info {
 	public $Lat = 0;
 	public $Long = 0;
 	public $Birthdate = null;
+	public $Number = "";
 
-	function __construct($xml)
+	function __construct($xml, $number)
 	{
 		if($xml->Success == "false")
 			throw new SendegaException("No hit for " . $number, 9999);
+
+		$this->Number = $number;
 		if($xml->Persons->SubscriberInformationPerson->count() > 0)
 		{
 			$this->map($xml->Persons->SubscriberInformationPerson);
