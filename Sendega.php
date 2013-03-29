@@ -1,4 +1,9 @@
 <?php
+interface iLogger
+{
+	public function Log(array $message);
+}
+
 class Sendega 
 {
 
@@ -24,6 +29,9 @@ class Sendega
 				"dcs" => 0
 				);
 
+	public $Fake = false;
+	private $Logger = null;
+
 	function __construct($un, $pwd, $sender = "")
 	{
 		if(strlen($un) == 0 || strlen($pwd) == 0)
@@ -48,8 +56,27 @@ class Sendega
 	private function call($content)
 	{
 		$url = $this->base . "?" . http_build_query($content);
-		$status = file_get_contents($url);
-		return $this->handleResponse($status);
+		$this->Log($content);
+		if(!$this->Fake)
+		{
+			$status = file_get_contents($url);
+			return $this->handleResponse($status);
+		}
+	}
+
+	private function Log(array $msg)
+	{
+		if($this->Logger != null)
+		{
+			unset($msg["username"]);
+			unset($msg["password"]);
+			$this->Logger->Log($msg);
+		}
+	}
+
+	function SetLogger($L)
+	{
+		$this->Logger = $L;
 	}
 
 	function SendDeliveryReport($url)
