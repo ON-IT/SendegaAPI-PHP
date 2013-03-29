@@ -32,7 +32,7 @@ class Sendega
 	public $Fake = false;
 	private $Logger = null;
 
-	function __construct($un, $pwd, $sender = "")
+	function __construct($un, $pwd, $sender)
 	{
 		if(strlen($un) == 0 || strlen($pwd) == 0)
 		{
@@ -41,32 +41,36 @@ class Sendega
 		$this->properties["username"] = $un;
 		$this->properties["password"] = $pwd;
 		if(strlen($sender) > 0){
-			$this->properties["sender"] = urlencode($sender);
+			$this->properties["sender"] = $sender;
 		}
 	}
 
-	private function handleResponse($response)
+	private function handleResponse($response, $content)
 	{
 		$status = simplexml_load_string($response);
 		if($status->Success == 'true')
+		{
+			$content["messageID"] = $status->MessageID;
+			$content["status"] = true;
+			$this->Log($content);
 			return $status->MessageID;
+		}
+
+		$content["status"] = false;
+		$this->Log($content);
 		throw new SendegaException($status);
 	}
 
 	private function call($content)
 	{
 		$url = $this->base . "?" . http_build_query($content);
-		$this->Log($content);
-		if(!$this->Fake)
-		{
-			$status = file_get_contents($url);
-			return $this->handleResponse($status);
-		}
+		$status = file_get_contents($url);
+		return $this->handleResponse($status, $content);
 	}
 
 	private function Log(array $msg)
 	{
-		if($this->Logger != null)
+		if($this->Logger != null && $this->Logger instanceof iLogger)
 		{
 			unset($msg["username"]);
 			unset($msg["password"]);
