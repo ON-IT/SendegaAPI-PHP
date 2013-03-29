@@ -111,7 +111,7 @@ class Sendega
 			$zip->close();
 			$encoded = base64_encode(file_get_contents($file));
 			unlink($file);
-			$mms["content"] = base64_encode($encoded);
+			$mms["content"] = $encoded;
 		}
 		
 		if(strlen($sender) > 0)
