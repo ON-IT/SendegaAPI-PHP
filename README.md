@@ -19,7 +19,6 @@ Sendega SMS API is a basic wrapper for sending SMS and MMS through Sendega.com. 
  * Premium SMS and MMS (charging recipient)
  * Automatic image resize for MMS
  * Function for generating and sending VCF as MMS
- * Logging
  * World domination
 
 ## License
