@@ -50,13 +50,17 @@ class Sendega
 		$status = simplexml_load_string($response);
 		if($status->Success == 'true')
 		{
-			$content["messageID"] = $status->MessageID;
+			$content["messageID"] = (string)$status->MessageID;
 			$content["status"] = true;
+			$content["statustext"] = "PENDING";
 			$this->Log($content);
-			return $status->MessageID;
+			return (string)$status->MessageID;
 		}
 
-		$content["status"] = false;
+		$content["status"] = 0;
+		$content["statustext"] = "ERROR";
+		$content["errormessage"] = (string)$status->ErrorMessage;
+		$content["errorcode"] = (int)$status->ErrorNumber;
 		$this->Log($content);
 		throw new SendegaException($status);
 	}
@@ -215,8 +219,8 @@ class SendegaException extends Exception
 	{
 		if($code == 0)
 		{
-			$this->message = $status->ErrorMessage;
-			$this->code = $status->ErrorNumber;
+			$this->message = (string)$status->ErrorMessage;
+			$this->code = (int)$status->ErrorNumber;
 		} else {
 			$this->message = $status;
 			$this->code = $code;
